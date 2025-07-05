@@ -23,11 +23,13 @@
   "dependencies": {
     "@rocketseat/eslint-config": "^2.2.2",
     "@types/node": "^24.0.10",
+    "dotenv": "^17.0.1",
     "eslint": "^8.57.1",
     "fastify": "^5.4.0",
     "knex": "^3.1.0",
     "sqlite3": "^5.1.7",
-    "tsx": "^4.20.3"
+    "tsx": "^4.20.3",
+    "zod": "^3.25.74"
   },
   "devDependencies": {
     "ts-node": "^10.9.2",
