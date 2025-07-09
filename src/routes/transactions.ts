@@ -4,12 +4,6 @@ import { randomUUID } from 'node:crypto'
 import { knex } from '../database'
 import { checkSessionIdExists } from '../middlewares/check-session-id-exists'
 
-// unitários: APENAS uma unidade da aplicação
-// integração: comunicação entre duas ou mais unidades
-// e2e: ponta a ponta, simulam um usuário real, testam a aplicação como um todo
-
-// Pirâmide de testes: E2E (Não dependem de nenhuma tecnologia, não dependem de arquitetura)
-
 export async function transactionsRoutes(app: FastifyInstance) {
   app.get(
     '/',
@@ -23,9 +17,7 @@ export async function transactionsRoutes(app: FastifyInstance) {
         .where('session_id', sessionId)
         .select()
 
-      return {
-        transactions,
-      }
+      return { transactions }
     },
   )
 
@@ -35,14 +27,15 @@ export async function transactionsRoutes(app: FastifyInstance) {
       preHandler: [checkSessionIdExists],
     },
     async (request) => {
-      const getTransactionParamsSchema = z.object({
+      const getTransactionsParamsSchema = z.object({
         id: z.string().uuid(),
       })
 
-      const { id } = getTransactionParamsSchema.parse(request.params)
+      const { id } = getTransactionsParamsSchema.parse(request.params)
+
       const { sessionId } = request.cookies
 
-      const transactions = await knex('transactions')
+      const transaction = await knex('transactions')
         .where({
           session_id: sessionId,
           id,
@@ -50,7 +43,7 @@ export async function transactionsRoutes(app: FastifyInstance) {
         .first()
 
       return {
-        transactions,
+        transaction,
       }
     },
   )
@@ -68,9 +61,7 @@ export async function transactionsRoutes(app: FastifyInstance) {
         .sum('amount', { as: 'amount' })
         .first()
 
-      return {
-        summary,
-      }
+      return { summary }
     },
   )
 
@@ -90,9 +81,9 @@ export async function transactionsRoutes(app: FastifyInstance) {
     if (!sessionId) {
       sessionId = randomUUID()
 
-      reply.cookie('sessionId', sessionId, {
+      reply.setCookie('sessionId', sessionId, {
         path: '/',
-        maxAge: 60 * 60 * 24 * 7, // 7 days
+        maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
       })
     }
 
